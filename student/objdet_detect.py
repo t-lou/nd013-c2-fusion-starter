@@ -234,12 +234,12 @@ def detect_objects(input_bev_maps, model, configs):
     scaling_x = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
     scaling_y = (configs.lim_y[1] - configs.lim_y[0]) / configs.bev_width
 
-    id_vehicle = 0 # vehicle hast id 1 but should be the first one, as the other two has id 2 and 4
+    id_vehicle = 1
     for detection in detections:
         ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
-        if bool(detection) and bool(detection[id_vehicle]):
-            # (scores-0:1, x-1:2, y-2:3, z-3:4, dim-4:7, yaw-7:8)
-            score, x, y, z, h, w, l, yaw = detection[id_vehicle]
+        vehicles = detection[id_vehicle]
+        for vehicle in vehicles:
+            score, y, x, z, h, w, l, yaw = vehicle # why different from DFA?
             x = x * scaling_x + configs.lim_x[0]
             y = y * scaling_y + configs.lim_y[0]
             z += configs.lim_z[0]
