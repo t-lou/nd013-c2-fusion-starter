@@ -229,13 +229,27 @@ def detect_objects(input_bev_maps, model, configs):
     objects = []
 
     ## step 1 : check whether there are any detections
+    ## step 2 : loop over all detections
 
-        ## step 2 : loop over all detections
+    scaling_x = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
+    scaling_y = (configs.lim_y[1] - configs.lim_y[0]) / configs.bev_width
 
-            ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
-
+    id_vehicle = 0 # vehicle hast id 1 but should be the first one, as the other two has id 2 and 4
+    for detection in detections:
+        ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
+        if bool(detection) and bool(detection[id_vehicle]):
+            # (scores-0:1, x-1:2, y-2:3, z-3:4, dim-4:7, yaw-7:8)
+            score, x, y, z, h, w, l, yaw = detection[id_vehicle]
+            x = x * scaling_x + configs.lim_x[0]
+            y = y * scaling_y + configs.lim_y[0]
+            z += configs.lim_z[0]
+            scaling_lon = np.cos(yaw) * scaling_x - np.sin(yaw) * scaling_y
+            scaling_lat = np.sin(yaw) * scaling_x + np.cos(yaw) * scaling_y
+            w *= scaling_lon
+            l *= scaling_lat
+            yaw = -yaw
             ## step 4 : append the current object to the 'objects' array
-
+            objects.append([1, x, y, z, h, w, l, yaw])
     #######
     ####### ID_S3_EX2 START #######
 
