@@ -112,6 +112,7 @@ def load_configs_model(model_name='darknet', configs=None):
     configs.no_cuda = True # if true, cuda is not used
     configs.gpu_idx = 0  # GPU index to use.
     configs.device = torch.device('cpu' if configs.no_cuda else 'cuda:{}'.format(configs.gpu_idx))
+    configs.min_iou = 0.7
 
     return configs
 
@@ -200,7 +201,8 @@ def detect_objects(input_bev_maps, model, configs):
                 for obj in detection:
                     x, y, w, l, im, re, _, _, _ = obj
                     yaw = np.arctan2(im, re)
-                    detections.append([1, x, y, 0.0, 1.50, w, l, yaw])
+                    detections.append([1, x.item(), y.item(), 0.0, 1.50, w.item(), l.item(), yaw])
+            return detections
 
         elif 'fpn_resnet' in configs.arch:
             # decode output and perform post-processing
