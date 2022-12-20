@@ -93,8 +93,10 @@ def show_range_image(frame, lidar_name):
     # cv2.imwrite('channel_intensity.png', channel_intensity) # for test
 
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
-    
-    img_range_intensity = [] # remove after implementing all steps
+    img_range_intensity = np.vstack((channel_range, channel_intensity,))
+    cv2.imwrite('img_range_intensity.png', img_range_intensity) # for test
+    assert img_range_intensity.shape[0] == img.shape[0] * 2
+    assert img_range_intensity.shape[1] == img.shape[1]
     #######
     ####### ID_S1_EX1 END #######     
     
