@@ -36,6 +36,7 @@ def show_pcl(pcl):
     ####### ID_S1_EX2 START #######     
     #######
     print("student task ID_S1_EX2")
+    assert False
 
     # step 1 : initialize open3d with key callback and create window
     
@@ -59,15 +60,38 @@ def show_range_image(frame, lidar_name):
     print("student task ID_S1_EX1")
 
     # step 1 : extract lidar data and range image for the roof-mounted lidar
-    
     # step 2 : extract the range and the intensity channel from the range image
-    
     # step 3 : set values <0 to zero
-    
+    import zlib
+    img = None
+    for image in frame.lasers:
+        if image.name == lidar_name:
+            img = dataset_pb2.MatrixFloat()
+            img.ParseFromString(zlib.decompress(image.ri_return1.range_image_compressed))
+            img = np.array(img.data).reshape(img.shape.dims)
+            img[img < 0] = 0
+            break
+
+    assert img is not None, 'Lidar name not found'
+    channel_range = img[:,:, 0]
+    channel_intensity = img[:,:, 1]
+
     # step 4 : map the range channel onto an 8-bit scale and make sure that the full range of values is appropriately considered
+    channel_range /= channel_range.max()
+    channel_range *= 255.0
+    channel_range = np.array(channel_range, dtype=np.uint8)
+    # cv2.imwrite('channel_range.png', channel_range) # for test
     
     # step 5 : map the intensity channel onto an 8-bit scale and normalize with the difference between the 1- and 99-percentile to mitigate the influence of outliers
-    
+    thres_upper = np.percentile(channel_intensity, 99)
+    thres_lower = np.percentile(channel_intensity, 1)
+    channel_intensity -= thres_lower
+    channel_intensity[channel_intensity > thres_upper] = thres_upper
+    channel_intensity /= thres_upper
+    channel_intensity *= 255.0
+    channel_intensity = np.array(channel_intensity, dtype=np.uint8)
+    # cv2.imwrite('channel_intensity.png', channel_intensity) # for test
+
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
     
     img_range_intensity = [] # remove after implementing all steps
