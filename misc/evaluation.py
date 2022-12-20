@@ -13,7 +13,8 @@
 # imports
 import numpy as np
 import matplotlib
-matplotlib.use('wxagg') # change backend so that figure maximizing works on Mac as well     
+# Doesn't work in docker out-of-box
+# matplotlib.use('wxagg') # change backend so that figure maximizing works on Mac as well
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.path import Path
