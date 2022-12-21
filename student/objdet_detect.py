@@ -182,6 +182,20 @@ def create_model(configs):
 # detect trained objects in birds-eye view
 def detect_objects(input_bev_maps, model, configs):
 
+    scaling_x = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
+    scaling_y = (configs.lim_y[1] - configs.lim_y[0]) / configs.bev_width
+    def descale_object(obj_in: list) -> list:
+        label, x, y, z, h, w, l, yaw = obj_in
+        x = x * scaling_x + configs.lim_x[0]
+        y = y * scaling_y + configs.lim_y[0]
+        z += configs.lim_z[0]
+        scaling_lon = np.cos(yaw) * scaling_x - np.sin(yaw) * scaling_y
+        scaling_lat = np.sin(yaw) * scaling_x + np.cos(yaw) * scaling_y
+        w *= scaling_lon
+        l *= scaling_lat
+        yaw = -yaw
+        return [label, x, y, z, h, w, l, yaw]
+
     # deactivate autograd engine during test to reduce memory usage and speed up computations
     with torch.no_grad():
 
@@ -190,6 +204,7 @@ def detect_objects(input_bev_maps, model, configs):
 
         # decode model output into target object format
         if 'darknet' in configs.arch:
+            from tools.objdet_models.resnet.utils.torch_utils import to_cpu
 
             # perform post-processing
             output_post = post_processing_v2(outputs, conf_thresh=configs.conf_thresh, nms_thresh=configs.nms_thresh)
@@ -199,9 +214,9 @@ def detect_objects(input_bev_maps, model, configs):
                     continue
                 detection = output_post[sample_i]
                 for obj in detection:
-                    x, y, w, l, im, re, _, _, _ = obj
+                    x, y, w, l, im, re, _, _, _ = to_cpu(obj).numpy()[:]
                     yaw = np.arctan2(im, re)
-                    detections.append([1, x.item(), y.item(), 0.0, 1.50, w.item(), l.item(), yaw])
+                    detections.append(descale_object([1, x.item(), y.item(), 0.0, 1.50, w.item(), l.item(), yaw]))
             return detections
 
         elif 'fpn_resnet' in configs.arch:
@@ -233,25 +248,14 @@ def detect_objects(input_bev_maps, model, configs):
     ## step 1 : check whether there are any detections
     ## step 2 : loop over all detections
 
-    scaling_x = (configs.lim_x[1] - configs.lim_x[0]) / configs.bev_height
-    scaling_y = (configs.lim_y[1] - configs.lim_y[0]) / configs.bev_width
-
     id_vehicle = 1
     for detection in detections:
         ## step 3 : perform the conversion using the limits for x, y and z set in the configs structure
         vehicles = detection[id_vehicle]
         for vehicle in vehicles:
-            score, y, x, z, h, w, l, yaw = vehicle # why different from DFA?
-            x = x * scaling_x + configs.lim_x[0]
-            y = y * scaling_y + configs.lim_y[0]
-            z += configs.lim_z[0]
-            scaling_lon = np.cos(yaw) * scaling_x - np.sin(yaw) * scaling_y
-            scaling_lat = np.sin(yaw) * scaling_x + np.cos(yaw) * scaling_y
-            w *= scaling_lon
-            l *= scaling_lat
-            yaw = -yaw
+            _, y, x, z, h, w, l, yaw = vehicle # why different from DFA?
             ## step 4 : append the current object to the 'objects' array
-            objects.append([1, x, y, z, h, w, l, yaw])
+            objects.append(descale_object([1, x, y, z, h, w, l, yaw]))
     #######
     ####### ID_S3_EX2 START #######
 
