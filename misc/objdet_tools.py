@@ -407,7 +407,7 @@ def show_objects_in_bev_labels_in_camera(detections, bev_maps, image, object_lab
     cv2.imshow('labels vs. detected objects', out_img)
     # also save to docs
     id_img = student.utils.count_files('docs_mid_term', 'labels_vs_detected_objects_*.png') + 1
-    cv2.imwrite(f'docs_mid_term/labels_vs_detected_objects_{id_img}.png', out_img * 255)
+    cv2.imwrite(f'docs_mid_term/labels_vs_detected_objects_{id_img}.png', out_img)
 
 
 # visualize object labels in camera image
