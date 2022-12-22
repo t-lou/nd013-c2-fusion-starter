@@ -30,7 +30,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from tools.waymo_reader.simple_waymo_open_dataset_reader import utils as waymo_utils
 from tools.waymo_reader.simple_waymo_open_dataset_reader import WaymoDataFileReader, dataset_pb2, label_pb2
 
-
+import student.utils
 
 ##################
 # LIDAR
@@ -405,6 +405,9 @@ def show_objects_in_bev_labels_in_camera(detections, bev_maps, image, object_lab
 
     # show combined view
     cv2.imshow('labels vs. detected objects', out_img)
+    # also save to docs
+    id_img = student.utils.count_files('docs_mid_term', 'labels_vs_detected_objects_*.png') + 1
+    cv2.imwrite(f'docs_mid_term/labels_vs_detected_objects_{id_img}.png', out_img * 255)
 
 
 # visualize object labels in camera image

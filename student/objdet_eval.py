@@ -95,7 +95,7 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     all_positives = len(labels_valid)
 
     ## step 2 : compute the number of false negatives
-    true_positives = len(matches_lab_det)
+    true_positives = len(ious)
     false_negatives = all_positives - true_positives
 
     ## step 3 : compute the number of false positives

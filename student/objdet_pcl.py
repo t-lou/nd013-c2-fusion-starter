@@ -29,6 +29,8 @@ from tools.waymo_reader.simple_waymo_open_dataset_reader import dataset_pb2, lab
 # object detection tools and helper functions
 import misc.objdet_tools as tools
 
+import student.utils
+
 G_INIT = {
     'show_pcl': None,
     'show_pcl_initialized': False,
@@ -69,20 +71,10 @@ def show_pcl(pcl):
         G_INIT['show_pcl'].update_geometry(pcd)
 
     # step 5 : visualize point cloud and keep window open until right-arrow is pressed (key-code 262)
-    G_INIT['show_pcl'].poll_events()
-    G_INIT['show_pcl'].update_renderer()
-    time.sleep(3)
+    G_INIT['show_pcl'].run()
 
     #######
     ####### ID_S1_EX2 END #######
-    # Below interaction works, but will create another window.
-    # vis = open3d.visualization.VisualizerWithKeyCallback()
-    # vis.create_window('Lidar Viewer')
-    # vis.register_key_action_callback(262, lambda _1, _2, _3: vis.close() is not None)
-    # pcd = open3d.geometry.PointCloud()
-    # pcd.points = open3d.utility.Vector3dVector(pcl[:, :3])
-    # vis.add_geometry(pcd)
-    # vis.run()
 
 
 # visualize range image
@@ -127,9 +119,13 @@ def show_range_image(frame, lidar_name):
 
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
     img_range_intensity = np.vstack((channel_range, channel_intensity,))
-    cv2.imwrite('img_range_intensity.png', img_range_intensity) # for test
     assert img_range_intensity.shape[0] == img.shape[0] * 2
     assert img_range_intensity.shape[1] == img.shape[1]
+    # crop the image
+    fourth_width = img.shape[1] // 4
+    img_range_intensity = img_range_intensity[:, fourth_width:(fourth_width * 3)]
+    id_img = student.utils.count_files('docs_mid_term', 'img_range_intensity_*.png') + 1
+    cv2.imwrite(f'docs_mid_term/img_range_intensity_{id_img}.png', img_range_intensity)
     #######
     ####### ID_S1_EX1 END #######
 
@@ -200,7 +196,8 @@ def bev_from_pcl(lidar_pcl, configs):
         intensity_map[int(pt[0]), int(pt[1])] = normalize_intensity(pt[3])
 
     ## step 5 : temporarily visualize the intensity map using OpenCV to make sure that vehicles separate well from the background
-    cv2.imwrite('intensity_map.png', intensity_map * 255)
+    id_img = student.utils.count_files('docs_mid_term', 'intensity_map_*.png') + 1
+    cv2.imwrite(f'docs_mid_term/intensity_map_{id_img}.png', intensity_map * 255)
     #######
     ####### ID_S2_EX2 END #######
 
@@ -222,7 +219,8 @@ def bev_from_pcl(lidar_pcl, configs):
         height_map[int(pt[0]), int(pt[1])] = normalize_height(pt[2])
 
     ## step 3 : temporarily visualize the intensity map using OpenCV to make sure that vehicles separate well from the background
-    cv2.imwrite('height_map.png', height_map * 255)
+    id_img = student.utils.count_files('docs_mid_term', 'height_map_*.png') + 1
+    cv2.imwrite(f'docs_mid_term/height_map_{id_img}.png', height_map * 255)
 
     #######
     ####### ID_S2_EX3 END #######
