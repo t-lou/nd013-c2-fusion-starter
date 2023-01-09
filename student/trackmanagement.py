@@ -35,20 +35,21 @@ class Track:
         # - initialize track state and track score with appropriate values
         ############
 
-        self.x = np.matrix([[49.53980697],
-                        [ 3.41006279],
-                        [ 0.91790581],
-                        [ 0.        ],
-                        [ 0.        ],
-                        [ 0.        ]])
-        self.P = np.matrix([[9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 6.4e-03, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+01]])
-        self.state = 'confirmed'
-        self.score = 0
+        pos = np.array([[meas.z[i]] if i < 3 else [1.] for i in range(4)])
+        pos = (meas.sensor.sens_to_veh * pos)[:3]
+
+        self.x = np.ones([params.dim_state, 1])
+        self.x[0:3] = pos
+
+        self.P = np.zeros([6, 6])
+        self.P[:3, :3] = M_rot * meas.R * M_rot.T
+        self.P[3:, 3:] = np.matrix([
+            [params.sigma_p44**2, 0, 0],
+            [0, params.sigma_p55**2, 0],
+            [0, 0, params.sigma_p66**2],
+        ])
+        self.state = 'initialized'
+        self.score = 1./params.window
         
         ############
         # END student code
