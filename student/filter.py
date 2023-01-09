@@ -30,8 +30,15 @@ class Filter:
         ############
         # TODO Step 1: implement and return system matrix F
         ############
-
-        return 0
+        d = params.dt
+        return np.array([
+            [1,0,0,d,0,0],
+            [0,1,0,0,d,0],
+            [0,0,1,0,0,d],
+            [0,0,0,1,0,0],
+            [0,0,0,0,1,0],
+            [0,0,0,0,0,1],
+        ])
         
         ############
         # END student code
@@ -41,8 +48,17 @@ class Filter:
         ############
         # TODO Step 1: implement and return process noise covariance Q
         ############
-
-        return 0
+        dt1 = params.dt
+        dt2 = dt1 * dt1 / 2
+        dt3 = dt1 * dt1 * dt1 / 3
+        return np.array([
+            [dt3,0  ,0  ,dt2,0  ,0  ],
+            [0  ,dt3,0  ,0  ,dt2,0  ],
+            [0  ,0  ,dt3,0  ,0  ,dt2],
+            [dt2,0  ,0  ,dt1,0  ,0  ],
+            [0  ,dt2,0  ,0  ,dt1,  0],
+            [0  ,0  ,dt2,0  ,0  ,dt1],
+        ]) * params.q
         
         ############
         # END student code
