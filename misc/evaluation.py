@@ -144,7 +144,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
     
     # maximize window        
     mng = plt.get_current_fig_manager()
-    mng.frame.Maximize(True)
+    # mng.frame.Maximize(True) not working
     
     # axis 
     ax.set_xlabel('y [m]')
