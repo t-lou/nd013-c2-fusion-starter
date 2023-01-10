@@ -51,6 +51,7 @@ class Track:
         self.P = np.matrix(self.P)
         self.state = 'initialized'
         self.score = 1./params.window
+        self.was_confirmed = False
 
         ############
         # END student code
@@ -113,7 +114,7 @@ class Trackmanagement:
 
         # delete old tracks
         for track in self.track_list:
-            if track.state == 'tentative' and \
+            if track.state == 'tentative' and track.was_confirmed and \
                     (track.score < params.delete_threshold or max(track.P[0,0], track.P[1,1]) > params.max_P):
                 self.delete_track(track)
 
@@ -149,7 +150,10 @@ class Trackmanagement:
 
         track.score += 1./params.window
 
-        track.state = 'confirmed' if track.score > params.confirmed_threshold else 'tentative'
+        is_confirmed = track.score > params.confirmed_threshold
+        track.state = 'confirmed' if is_confirmed else 'tentative'
+        if is_confirmed:
+            track.was_confirmed = True
 
         ############
         # END student code
