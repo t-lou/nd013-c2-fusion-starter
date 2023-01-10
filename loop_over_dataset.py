@@ -55,7 +55,7 @@ data_filename = 'training_segment-1005081002024129653_5313_150_5333_150_with_cam
 # data_filename = 'training_segment-10963653239323173269_1924_000_1944_000_with_camera_labels.tfrecord' # Sequence 3
 show_selected_frames = False # True: use the list below as indices; False: use the list below as interval
 # show_only_frames = list(range(10, 200, 20)[:10]) # show only frames for debugging, interval when show_selected_frames is false.
-show_only_frames = [0, 200] # show only frames for debugging, interval when show_selected_frames is false.
+show_only_frames = [0, 50] # show only frames for debugging, interval when show_selected_frames is false.
 
 ## Prepare Waymo Open Dataset file for loading
 data_fullpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'dataset', data_filename) # adjustable path in case this script is called from another working directory
@@ -81,7 +81,7 @@ camera = None # init camera sensor object
 np.random.seed(10) # make random values predictable
 
 ## Selective execution and visualization
-exec_data = ['pcl_from_rangeimage', 'load_image'] # ['pcl_from_rangeimage', 'load_image']
+exec_data = [] # ['pcl_from_rangeimage', 'load_image']
 exec_detection = [] # options are 'bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance'; options not in the list will be loaded from file
 exec_tracking = ['perform_tracking'] # options are 'perform_tracking'
 exec_visualization = ['show_tracks'] # options are 'show_range_image', 'show_bev', 'show_pcl', 'show_labels_in_image', 'show_objects_and_labels_in_bev', 'show_objects_in_bev_labels_in_camera', 'show_tracks', 'show_detection_performance', 'make_tracking_movie'

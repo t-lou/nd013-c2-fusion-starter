@@ -26,10 +26,9 @@ import misc.params as params
 class Association:
     '''Data association class with single nearest neighbor association and gating based on Mahalanobis distance'''
     def __init__(self):
-        self.association_matrix = np.matrix([])
+        self.association_matrix = np.matrix([[]])
         self.unassigned_tracks = []
         self.unassigned_meas = []
-        self.impossible = 1e9
 
     def associate(self, track_list, meas_list, KF):
 
@@ -46,14 +45,14 @@ class Association:
         self.unassigned_meas = list(range(M))
 
         if min(N, M) <= 0:
-            self.association_matrix = np.matrix([])
+            self.association_matrix = np.matrix([[]])
             return
 
         self.association_matrix = np.matrix(np.zeros([N, M]))
         for i in range(N):
             for j in range(M):
                 self.association_matrix[i, j] = self.MHD(track_list[i], meas_list[j], KF)
-        self.association_matrix[self.gating(self.association_matrix, meas_list[0])] = self.impossible
+        self.association_matrix[~self.gating(self.association_matrix, meas_list[0])] = np.inf
 
         ############
         # END student code
@@ -74,11 +73,16 @@ class Association:
             self.association_matrix.shape
         )
 
+        if np.isnan(self.association_matrix[update_track, update_meas]):
+            return np.nan, np.nan
+
         # remove from list
-        self.unassigned_tracks.remove(update_track)
-        self.unassigned_meas.remove(update_meas)
         self.association_matrix = np.delete(self.association_matrix, update_track, 0)
         self.association_matrix = np.delete(self.association_matrix, update_meas, 1)
+        update_track = self.unassigned_tracks[update_track]
+        update_meas = self.unassigned_meas[update_meas]
+        self.unassigned_tracks.remove(update_track)
+        self.unassigned_meas.remove(update_meas)
 
         ############
         # END student code
@@ -90,7 +94,7 @@ class Association:
         # TODO Step 3: return True if measurement lies inside gate, otherwise False
         ############
 
-        return MHD > chi2.ppf(params.gating_threshold, 3)
+        return MHD < chi2.ppf(params.gating_threshold, 3)
 
         ############
         # END student code
@@ -101,10 +105,10 @@ class Association:
         # TODO Step 3: calculate and return Mahalanobis distance
         ############
 
-        obs = meas.sensor.get_H(track.x)
-        diff = meas.z - obs * track.x
-        S = meas.R + obs * track.P * obs.T
-        return diff.T * np.linalg.inv(S) * diff
+        H = meas.sensor.get_H(track.x)
+        gamma = KF.gamma(track, meas)
+        S = KF.S(track, meas, H)
+        return gamma.T * np.linalg.inv(S) * gamma
 
         ############
         # END student code

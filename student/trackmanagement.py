@@ -34,8 +34,8 @@ class Track:
         # unassigned measurement transformed from sensor to vehicle coordinates
         # - initialize track state and track score with appropriate values
         ############
-        pos = np.array([[meas.z[i, 0]] if i < 3 else [1.] for i in range(4)])
-        pos = (meas.sensor.sens_to_veh * pos)[:3]
+        pos = np.matrix([[meas.z[i, 0]] if i < 3 else [1.] for i in range(4)])
+        pos = (meas.sensor.sens_to_veh * pos)[:3,:]
 
         self.x = np.ones([params.dim_state, 1])
         self.x[0:3] = pos
@@ -113,7 +113,8 @@ class Trackmanagement:
 
         # delete old tracks
         for track in self.track_list:
-            if (track.score < params.delete_threshold) or max(track.P[0,0], track.P[1,1]) > params.max_P:
+            if track.state == 'tentative' and \
+                    (track.score < params.delete_threshold or max(track.P[0,0], track.P[1,1]) > params.max_P):
                 self.delete_track(track)
 
 
