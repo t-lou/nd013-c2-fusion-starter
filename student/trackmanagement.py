@@ -40,6 +40,7 @@ class Track:
 
         self.x = np.ones([params.dim_state, 1])
         self.x[0:3] = pos
+        self.x = np.matrix(self.x)
 
         self.P = np.zeros([6, 6])
         self.P[:3, :3] = M_rot * meas.R * M_rot.T
@@ -48,6 +49,7 @@ class Track:
             [0, params.sigma_p55**2, 0],
             [0, 0, params.sigma_p66**2],
         ])
+        self.P = np.matrix(self.P)
         self.state = 'initialized'
         self.score = 1./params.window
         

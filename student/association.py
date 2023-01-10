@@ -42,9 +42,11 @@ class Association:
         # the following only works for at most one track and one measurement
         N = len(track_list)
         M = len(meas_list)
+        self.unassigned_tracks = list(range(N))
+        self.unassigned_meas = list(range(M))
 
         if min(N, M) <= 0:
-            self.__init__()
+            self.association_matrix = np.matrix([])
             return
 
         self.association_matrix = np.matrix(np.zeros([N, M]))
@@ -52,9 +54,6 @@ class Association:
             for j in range(M):
                 self.association_matrix[i, j] = self.MHD(track_list[i], meas_list[j], KF)
         self.association_matrix[self.gating(self.association_matrix, meas_list[0])] = self.impossible
-
-        self.unassigned_tracks = list(range(N))
-        self.unassigned_meas = list(range(M))
         
         ############
         # END student code
@@ -70,13 +69,16 @@ class Association:
         ############
 
         # the following only works for at most one track and one measurement
-        update_track = 0
-        update_meas = 0
+        update_track, update_meas = np.unravel_index(
+            np.argmin(self.association_matrix, axis=None),
+            self.association_matrix.shape
+        )
         
         # remove from list
         self.unassigned_tracks.remove(update_track) 
         self.unassigned_meas.remove(update_meas)
-        self.association_matrix = np.matrix([])
+        self.association_matrix = np.delete(self.association_matrix, update_track, 0)
+        self.association_matrix = np.delete(self.association_matrix, update_meas, 1)
             
         ############
         # END student code
@@ -88,7 +90,7 @@ class Association:
         # TODO Step 3: return True if measurement lies inside gate, otherwise False
         ############
         
-        return MHD < chi2.ppf(params.gating_threshold, 3)
+        return MHD > chi2.ppf(params.gating_threshold, 3)
         
         ############
         # END student code
@@ -99,7 +101,7 @@ class Association:
         # TODO Step 3: calculate and return Mahalanobis distance
         ############
         
-        obs = meas.sensor.getH(track.x)
+        obs = meas.sensor.get_H(track.x)
         diff = meas.z - obs * track.x
         S = meas.R + obs * track.P * obs.T
         return diff.T * np.linalg.inv(S) * diff

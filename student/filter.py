@@ -31,7 +31,7 @@ class Filter:
         # TODO Step 1: implement and return system matrix F
         ############
         d = params.dt
-        return np.array([
+        return np.matrix([
             [1,0,0,d,0,0],
             [0,1,0,0,d,0],
             [0,0,1,0,0,d],
@@ -51,7 +51,7 @@ class Filter:
         dt1 = params.dt
         dt2 = dt1 * dt1 / 2
         dt3 = dt1 * dt1 * dt1 / 3
-        return np.array([
+        return np.matrix([
             [dt3,0  ,0  ,dt2,0  ,0  ],
             [0  ,dt3,0  ,0  ,dt2,0  ],
             [0  ,0  ,dt3,0  ,0  ,dt2],
