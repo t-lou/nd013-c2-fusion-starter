@@ -29,6 +29,7 @@ class Association:
         self.association_matrix = np.matrix([])
         self.unassigned_tracks = []
         self.unassigned_meas = []
+        self.impossible = 1e9
         
     def associate(self, track_list, meas_list, KF):
              
@@ -39,16 +40,21 @@ class Association:
         ############
         
         # the following only works for at most one track and one measurement
-        self.association_matrix = np.matrix([]) # reset matrix
-        self.unassigned_tracks = [] # reset lists
-        self.unassigned_meas = []
-        
-        if len(meas_list) > 0:
-            self.unassigned_meas = [0]
-        if len(track_list) > 0:
-            self.unassigned_tracks = [0]
-        if len(meas_list) > 0 and len(track_list) > 0: 
-            self.association_matrix = np.matrix([[0]])
+        N = len(track_list)
+        M = len(meas_list)
+
+        if min(N, M) <= 0:
+            self.__init__()
+            return
+
+        self.association_matrix = np.matrix(np.zeros([N, M]))
+        for i in range(N):
+            for j in range(M):
+                self.association_matrix[i, j] = self.MHD(track_list[i], meas_list[j], KF)
+        self.association_matrix[self.gating(self.association_matrix, meas_list[0])] = self.impossible
+
+        self.unassigned_tracks = list(range(N))
+        self.unassigned_meas = list(range(M))
         
         ############
         # END student code
@@ -82,7 +88,7 @@ class Association:
         # TODO Step 3: return True if measurement lies inside gate, otherwise False
         ############
         
-        pass    
+        return MHD < chi2.ppf(params.gating_threshold, 3)
         
         ############
         # END student code
@@ -93,7 +99,10 @@ class Association:
         # TODO Step 3: calculate and return Mahalanobis distance
         ############
         
-        pass
+        obs = meas.sensor.getH(track.x)
+        diff = meas.z - obs * track.x
+        S = meas.R + obs * track.P * obs.T
+        return diff.T * np.linalg.inv(S) * diff
         
         ############
         # END student code
