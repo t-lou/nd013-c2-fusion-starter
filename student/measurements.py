@@ -85,7 +85,9 @@ class Sensor:
             pos_veh[:3] = x[:3]
             pos_sens = self.veh_to_sens * pos_veh
             pos_sens /= pos_sens[0]
-            return self.c_i - float(pos_sens[1]) * self.f_i, self.c_i - float(pos_sens[2]) * self.f_i
+            return np.array([
+                [self.c_i - float(pos_sens[1]) * self.f_i],
+                [self.c_i - float(pos_sens[2]) * self.f_i]])
 
             ############
             # END student code
@@ -173,7 +175,11 @@ class Measurement:
             # TODO Step 4: initialize camera measurement including z and R
             ############
 
-            pass
+            self.z = np.zeros((sensor.dim_meas,1))
+            self.z[0] = z[0]
+            self.z[1] = z[1]
+            self.R = np.matrix([[params.sigma_cam_i**2, 0],
+                                [0, params.sigma_cam_j**2]])
 
             ############
             # END student code
