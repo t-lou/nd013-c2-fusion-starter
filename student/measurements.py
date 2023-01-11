@@ -124,6 +124,9 @@ class Sensor:
         if self.name == 'lidar':
             meas = Measurement(num_frame, z, self)
             meas_list.append(meas)
+        elif self.name == 'camera':
+            meas = Measurement(num_frame, z, self)
+            meas_list.append(meas)
         return meas_list
 
         ############
