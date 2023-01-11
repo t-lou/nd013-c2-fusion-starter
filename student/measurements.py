@@ -48,6 +48,10 @@ class Sensor:
         # otherwise False.
         ############
 
+        if all(-np.pi/2 <= lim <= np.pi/2 for lim in self.fov):
+            if float(x[0]) <= 0: # only applies for such fov-s, we look forward
+                return False
+
         c = x[:]
         x = np.ones([4,1])
         x[:3] = c[:3]
