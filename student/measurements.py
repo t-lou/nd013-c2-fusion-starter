@@ -81,7 +81,11 @@ class Sensor:
             # - return h(x)
             ############
 
-            pass
+            pos_veh = np.ones((4, 1))
+            pos_veh[:3] = x[:3]
+            pos_sens = self.veh_to_sens * pos_veh
+            pos_sens /= pos_sens[0]
+            return self.c_i - float(pos_sens[1]) * self.f_i, self.c_i - float(pos_sens[2]) * self.f_i
 
             ############
             # END student code
