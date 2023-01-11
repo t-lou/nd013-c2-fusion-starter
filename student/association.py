@@ -52,7 +52,8 @@ class Association:
         for i in range(N):
             for j in range(M):
                 self.association_matrix[i, j] = self.MHD(track_list[i], meas_list[j], KF)
-        self.association_matrix[~self.gating(self.association_matrix, meas_list[0])] = np.inf
+                if not self.gating(self.association_matrix[i, j], meas_list[j].sensor):
+                    self.association_matrix[i, j] = np.inf
 
         ############
         # END student code
@@ -94,7 +95,7 @@ class Association:
         # TODO Step 3: return True if measurement lies inside gate, otherwise False
         ############
 
-        return MHD < chi2.ppf(params.gating_threshold, 3)
+        return MHD < chi2.ppf(params.gating_threshold, sensor.dim_meas)
 
         ############
         # END student code

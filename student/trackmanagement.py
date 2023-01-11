@@ -34,12 +34,12 @@ class Track:
         # unassigned measurement transformed from sensor to vehicle coordinates
         # - initialize track state and track score with appropriate values
         ############
-        pos = np.matrix([[meas.z[i, 0]] if i < 3 else [1.] for i in range(4)])
+        pos = np.matrix(np.ones([4,1]))
+        pos[:3,0] = meas.z
         pos = (meas.sensor.sens_to_veh * pos)[:3,:]
 
-        self.x = np.ones([params.dim_state, 1])
-        self.x[0:3] = pos
-        self.x = np.matrix(self.x)
+        self.x = np.matrix(np.ones([params.dim_state, 1]))
+        self.x[:3,0] = pos
 
         self.P = np.zeros([6, 6])
         self.P[:3, :3] = M_rot * meas.R * M_rot.T
@@ -51,7 +51,6 @@ class Track:
         self.P = np.matrix(self.P)
         self.state = 'initialized'
         self.score = 1./params.window
-        self.was_confirmed = False
 
         ############
         # END student code
@@ -114,8 +113,9 @@ class Trackmanagement:
 
         # delete old tracks
         for track in self.track_list:
-            if track.state == 'tentative' and track.was_confirmed and \
-                    (track.score < params.delete_threshold or max(track.P[0,0], track.P[1,1]) > params.max_P):
+            if track.state == 'confirmed' and track.score < params.delete_threshold:
+                self.delete_track(track)
+            elif max(track.P[0,0], track.P[1,1]) > params.max_P:
                 self.delete_track(track)
 
 
@@ -149,11 +149,7 @@ class Trackmanagement:
         ############
 
         track.score += 1./params.window
-
-        is_confirmed = track.score > params.confirmed_threshold
-        track.state = 'confirmed' if is_confirmed else 'tentative'
-        if is_confirmed:
-            track.was_confirmed = True
+        track.state = 'confirmed' if track.score > params.confirmed_threshold else 'tentative'
 
         ############
         # END student code
