@@ -87,7 +87,7 @@ class Sensor:
             pos_sens /= pos_sens[0]
             return np.array([
                 [self.c_i - float(pos_sens[1]) * self.f_i],
-                [self.c_i - float(pos_sens[2]) * self.f_i]])
+                [self.c_j - float(pos_sens[2]) * self.f_j]])
 
             ############
             # END student code
