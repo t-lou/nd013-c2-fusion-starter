@@ -118,3 +118,5 @@ download pkl in results and the tfrecords in dataset
 cd /app/project
 
 python3 loop_over_dataset.py
+
+## The video is compressed in docs/my_tracking_results.zip
