@@ -97,3 +97,24 @@ Association with global minima will also improve the stability of the tracks. As
 minimal distance, new tracks will be created where measurements are densely found.
 
 The classifcation can also be introduced into the track management.
+
+## How to run the code
+
+### 1. build docker
+
+docker build -t fusion-dev -f Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$(whoami) .
+
+### 2. run docker
+
+./run_docker.sh
+
+### 3. prepare data
+
+download pkl in results and the tfrecords in dataset
+
+
+### 4. run
+
+cd /app/project
+
+python3 loop_over_dataset.py
