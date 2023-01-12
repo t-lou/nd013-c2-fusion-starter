@@ -48,14 +48,12 @@ class Sensor:
         # otherwise False.
         ############
 
-        if all(-np.pi/2 <= lim <= np.pi/2 for lim in self.fov):
-            if float(x[0]) <= 0: # only applies for such fov-s, we look forward
-                return False
-
         c = x[:]
         x = np.ones([4,1])
         x[:3] = c[:3]
         x = (self.veh_to_sens * x)[:3]
+        if float(x[0]) <= 0: # only applies for such fov-s, we look forward
+            return False
         a = float(np.arctan2(x[1], x[0])) # why is it matrix??
 
         return self.fov[0] < a < self.fov[1]
