@@ -67,6 +67,16 @@ The RMSE for the whole system is as below.
 
 ![img](docs/RMSE.png)
 
+## about the last submission
+
+The last submission had two issues:
+
+1. the track state was initialized with [1,1,1] speed
+
+2. the impossible association candidates were assigned as "INF", but tested as "NAN"
+
+After correction, the results are as above.
+
 ### 2. Do you see any benefits in camera-lidar fusion compared to lidar-only tracking (in theory and in your concrete results)?
 
 In theory the fused data from camera and lidar is better than just lidar data, in perfect settings. The camera image has higher

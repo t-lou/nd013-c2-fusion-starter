@@ -74,7 +74,7 @@ class Association:
             self.association_matrix.shape
         )
 
-        if np.isnan(self.association_matrix[update_track, update_meas]):
+        if np.isinf(self.association_matrix[update_track, update_meas]):
             return np.nan, np.nan
 
         # remove from list
