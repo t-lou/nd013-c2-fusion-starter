@@ -19,7 +19,7 @@ import sys
 PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-import misc.params as params 
+import misc.params as params
 
 class Filter:
     '''Kalman filter class'''
@@ -39,10 +39,10 @@ class Filter:
             [0,0,0,0,1,0],
             [0,0,0,0,0,1],
         ])
-        
+
         ############
         # END student code
-        ############ 
+        ############
 
     def Q(self):
         ############
@@ -59,10 +59,10 @@ class Filter:
             [0  ,dt2,0  ,0  ,dt1,  0],
             [0  ,0  ,dt2,0  ,0  ,dt1],
         ]) * params.q
-        
+
         ############
         # END student code
-        ############ 
+        ############
 
     def predict(self, track):
         ############
@@ -71,10 +71,10 @@ class Filter:
 
         track.set_x(self.F() * track.x)
         track.set_P(self.F() * track.P * self.F().T + self.Q())
-        
+
         ############
         # END student code
-        ############ 
+        ############
 
     def update(self, track, meas):
         ############
@@ -85,25 +85,25 @@ class Filter:
         S = self.S(track, meas, H)
         K = track.P * H.T * np.linalg.inv(S)
         x = track.x + K * gamma
-        P = (np.eye(params.dim_state) - K * H) * track.P
-        
+        P = (np.identity(params.dim_state) - K * H) * track.P
+
         track.set_x(x)
         track.set_P(P)
         ############
         # END student code
-        ############ 
+        ############
         track.update_attributes(meas)
-    
+
     def gamma(self, track, meas):
         ############
         # TODO Step 1: calculate and return residual gamma
         ############
 
         return meas.z - meas.sensor.get_hx(track.x)
-        
+
         ############
         # END student code
-        ############ 
+        ############
 
     def S(self, track, meas, H):
         ############
@@ -111,7 +111,7 @@ class Filter:
         ############
 
         return H * track.P * H.T + meas.R
-        
+
         ############
         # END student code
-        ############ 
+        ############

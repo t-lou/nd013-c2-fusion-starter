@@ -83,7 +83,7 @@ class Sensor:
             pos_veh[:3] = x[:3]
             pos_sens = self.veh_to_sens * pos_veh
             pos_sens /= pos_sens[0]
-            return np.array([
+            return np.matrix([
                 [self.c_i - float(pos_sens[1]) * self.f_i],
                 [self.c_j - float(pos_sens[2]) * self.f_j]])
 

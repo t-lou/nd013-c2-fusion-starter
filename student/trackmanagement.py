@@ -38,7 +38,7 @@ class Track:
         pos[:3,0] = meas.z
         pos = (meas.sensor.sens_to_veh * pos)[:3,:]
 
-        self.x = np.matrix(np.ones([params.dim_state, 1]))
+        self.x = np.matrix(np.zeros([params.dim_state, 1]))
         self.x[:3,0] = pos
 
         self.P = np.zeros([6, 6])
@@ -148,7 +148,7 @@ class Trackmanagement:
         # - set track state to 'tentative' or 'confirmed'
         ############
 
-        track.score += 1./params.window
+        track.score = min(1./params.window + track.score, 1.0)
         track.state = 'confirmed' if track.score > params.confirmed_threshold else 'tentative'
 
         ############

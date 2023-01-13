@@ -55,7 +55,7 @@ data_filename = 'training_segment-1005081002024129653_5313_150_5333_150_with_cam
 # data_filename = 'training_segment-10963653239323173269_1924_000_1944_000_with_camera_labels.tfrecord' # Sequence 3
 show_selected_frames = False # True: use the list below as indices; False: use the list below as interval
 # show_only_frames = list(range(10, 200, 20)[:10]) # show only frames for debugging, interval when show_selected_frames is false.
-show_only_frames = [0, 50] # show only frames for debugging, interval when show_selected_frames is false.
+show_only_frames = [0, 200] # show only frames for debugging, interval when show_selected_frames is false.
 
 ## Prepare Waymo Open Dataset file for loading
 data_fullpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'dataset', data_filename) # adjustable path in case this script is called from another working directory
